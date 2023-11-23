@@ -16,8 +16,6 @@ public class TransmissionController implements Closeable{
     private Socket serverSocket;
     private Thread receivingThread;
 
-    private ArrayList<Integer> list;
-
     /**
      * Constructor of the transmission proxy <code>TransmissionController</code>
      * @param serverSocket The socket your program plugged
@@ -51,7 +49,7 @@ public class TransmissionController implements Closeable{
      */
     public <T extends Serializable> void send(T message){
         if(message == null){
-            listener.alertError("NONE-Pointer");
+            listener.alertError("NULL-Pointer");
             return;
         }
         new Thread(()->sender.send(message)).start();
@@ -70,7 +68,6 @@ public class TransmissionController implements Closeable{
 }
 
 class Sender implements Closeable{
-    private Socket socket;
     private ObjectOutputStream outputStream;
     private TransmissionListener listener;
     boolean flag;
@@ -85,29 +82,20 @@ class Sender implements Closeable{
         flag = true;
     }
     <T extends Serializable> void send(T data){
-        if(!flag) {
-            listener.alertError("WrongOutputStream");
-            return;
-        }
-
-        try{
-            outputStream.writeObject(data);
-        }catch (IOException e){
-            e.printStackTrace();
-            listener.alertError("WrongWrite");
-
-            flag = false;
-        }
-    }
-
-    @Deprecated
-    private void send(byte[] bytes){
-        try {
-            outputStream.write(bytes);
-            outputStream.flush();
-        } catch (IOException e) {
-            //throw new RuntimeException(e);
-            listener.alertError("todo");
+        //Ensure each thread can write the data to the stream one by one.
+        synchronized (this) {
+            if(!flag) {
+                listener.alertError("WrongOutputStream");
+                return;
+            }
+            try {
+                outputStream.writeObject(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+                listener.alertError("WrongWrite");
+                listener.onTransmissionError("WrongWrite", TransmissionListener.ErrorType.WRONG_WRITE);
+                flag = false;
+            }
         }
     }
 
@@ -137,7 +125,6 @@ class Receiver<T extends Serializable> implements Runnable, Closeable{
     @Override
     public void run(){
         while(flag){
-            ArrayList<T> list = new ArrayList<>();
             try {
                 T o = (T)objectInputStream.readObject();
                 listener.onTransmissionProgress(o);
@@ -149,6 +136,7 @@ class Receiver<T extends Serializable> implements Runnable, Closeable{
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 listener.alertError("ClassNotFound");
+
             }
         }
     }

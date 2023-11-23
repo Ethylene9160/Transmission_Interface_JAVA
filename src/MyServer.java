@@ -3,7 +3,6 @@ import web_tools.TransmissionController;
 import web_tools.TransmissionListener;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -24,18 +23,12 @@ public class MyServer{
         while(true){
             webID ++;
             Socket socket = moveServer.accept();
-            //System.out.println(socket.getRemoteSocketAddress());
-            //
             Channel moveChannel = new Channel(socket);
             moveChannel.ownID = webID;
             System.out.println("someone comes"+(listMap.size()+1));
-            //
-            //new DataOutputStream(socket.getOutputStream()).writeUTF(SEND_ID+Integer.toString(webID));
-            moveChannel.controller.send(new MyData(0,SEND_ID+Integer.toString(webID)));
+            //Because we're the server, so I don't want to send the <code>serverMessage</code> to the client.
+            moveChannel.controller.send(new MyData(MyData.STRING_INDEX,SEND_ID+Integer.toString(webID)));
             listMap.put(webID, moveChannel);
-            //list.add(moveChannel);
-            //
-//            new Thread(moveChannel).start();
         }
     }
 }
@@ -51,13 +44,6 @@ class Channel implements TransmissionListener<MyData> {
         }
     }
 
-
-    public void webAction(MyData data) {
-        String message = data.getServerMessage();
-        String info[] = message.split(MyServer.SPLIT_REG);
-        Objects.requireNonNull(MyServer.listMap.get(Integer.parseInt(info[0]))).controller.send(data);
-    }
-
     @Override
     public void onTransmissionStart() {
 
@@ -69,14 +55,18 @@ class Channel implements TransmissionListener<MyData> {
     }
 
     @Override
-    public void onTransmissionError(String message, int errorType) {
+    public void onTransmissionError(String message, ErrorType errorType) {
 
     }
 
     @Override
-    public void onTransmissionProgress(MyData messages) {
-//        String s = ((MyData) messages).getData();
-        webAction(messages);
+    public void onTransmissionProgress(MyData data) {
+        String message = data.getServerMessage();
+        System.out.println("Server reseive the msg: "+message);
+        //String info[] = message.split(MyServer.SPLIT_REG);
+
+        Objects.requireNonNull(MyServer.listMap.get(Integer.parseInt(message))).controller.send(data);
+        System.out.println("Server reseive the msg to: "+Integer.parseInt(message));
     }
 
     @Override

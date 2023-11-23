@@ -2,40 +2,41 @@ import web_tools.MyData;
 import web_tools.TransmissionController;
 import web_tools.TransmissionListener;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serial;
-import java.io.Serializable;
+import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         System.out.println("Mike INIT over");
         Person mike = new Person("Mike");
 
-        Thread.sleep(50);
+//        Thread.sleep(50);
 
         Person gan_yu = new Person("Gan Yu");
 
-        Thread.sleep(50);
+//        Thread.sleep(50);
 
         Person ye_yang = new Person("Wang Xiaomei");
-
-        Thread.sleep(100);
+        System.out.println("persons init over");
+//        Thread.sleep(100);
 
         mike.send(102, "bSo beautiful! ");
-
-        Thread.sleep(100);
+        System.out.println("mike send over");
+//        Thread.sleep(100);
 
         gan_yu.send(101, "bThk, Mike.");
+        System.out.println("gan_yu send over");
+//        Thread.sleep(100);
 
-        Thread.sleep(100);
-
-        gan_yu.send(101, "bDadada");
-
-        Thread.sleep(100);
+//        gan_yu.send(101, "bDadada");
+        gan_yu.send(101, new FileData("myHeader.jpg", "rec_header.jpg"));
+        System.out.println("gan_yu send over");
+//        Thread.sleep(100);
 
         ye_yang.send(101, "bI'm real Ganyu!!");
+        System.out.println("ye_yang send over");
     }
 }
 
@@ -55,18 +56,13 @@ class Person implements TransmissionListener<MyData> {
         }
     }
 
-//    @Override
-//    public void webAction(String message) {
-//        showMessage(message.charAt(0), message.substring(1));
-//    }
-
     public void send(int targetID, String info) {
         //String s = targetID + StringServer.SPLIT_REG + info;
-        controller.send(new MyData(MyData.STRING_INDEX,targetID + "#" + info));
+        controller.send(new MyData(MyData.STRING_INDEX,String.valueOf(targetID),info));
     }
 
     public void send(int targetID, FileData data) {
-        controller.send(new MyData(MyData.FILE_INDEX,targetID + "#" , data));
+        controller.send(new MyData(MyData.FILE_INDEX,String.valueOf(targetID) , data));
     }
 
     private void showMessage(char index, String msg) {
@@ -92,28 +88,27 @@ class Person implements TransmissionListener<MyData> {
     }
 
     @Override
-    public void onTransmissionError(String message, int errorType) {
+    public void onTransmissionError(String message, ErrorType errorType) {
 
     }
 
     @Override
     public void onTransmissionProgress(MyData data) {
         switch (data.getType()){
+            //If I get a string, I will show it.
             case MyData.STRING_INDEX:
-                String message = data.getServerMessage();
+                String message = data.getData();
                 showMessage(message.charAt(0), message.substring(1));
                 break;
+            // if I get a file, I will convert it to a file and write it to local path and store.
             case MyData.FILE_INDEX:
-                String fileData = data.getData();
-                //System.out.println(fileData.getFileName());
-                //help me to write this file to the local disk
-
+                FileData fileData = data.getData();
+                System.out.println(fileData.getFileName());
+                System.out.println(fileData.getFileBytes().length);
+                FileToBinaryConverter.binaryToWrittenFile(fileData.getFileBytes(), fileData.getFileName());
                 break;
         }
-//        String message = messages.getData();
-//        showMessage(message.charAt(0), message.substring(1));
     }
-
 
     @Override
     public void alertError(String error) {
@@ -121,16 +116,24 @@ class Person implements TransmissionListener<MyData> {
     }
 }
 
+/**
+ * A test class to store the file data. I use this class to store a file name and the binary of the file.
+ * And the put the file to the <code>MyData</code> class, as the member variable <code>data</code> in the <code>MyData</code> class.
+ */
 class FileData implements Serializable{
     @Serial
     private static final long serialVersionUID = 2333L;
-    private File file;
+    private byte[] file;
     private String fileName;
-    public FileData(File file, String fileName){
-        this.file = file;
+    public FileData(String filePath, String fileName){
+        try {
+            this.file = FileToBinaryConverter.fileToBinary(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         this.fileName = fileName;
     }
-    public File getFile(){
+    public byte[] getFileBytes(){
         return file;
     }
 
@@ -138,5 +141,51 @@ class FileData implements Serializable{
         return fileName;
     }
 }
+
+
+/**
+ * A class to convert file to binary and binary to file.
+ */
+class FileToBinaryConverter {
+    /**
+     * Convert a file to binary.
+     * @param file The file you want to convert.
+     * @return The binary of the file.
+     * @throws IOException When the file is not found, this exception will appear.
+     */
+    public static byte[] fileToBinary(File file) throws IOException {
+        // 使用Java的NIO库读取文件内容并返回二进制数组
+        return Files.readAllBytes(file.toPath());
+    }
+
+    /**
+     * Convert a file to binary.
+     * @param filePath The path(String) of the file you want to convert.
+     * @return The binary of the file.
+     * @throws IOException When the file is not found, this exception will appear.
+     */
+    public static byte[] fileToBinary(String filePath) throws IOException {
+        // 使用Java的NIO库读取文件内容并返回二进制数组
+        return Files.readAllBytes(Paths.get(filePath));
+    }
+
+    /**
+     * Convert binary to file.
+     * @param binaryData The binary you want to convert.
+     * @param filePath The path(String) of the file you want to write to.
+     */
+    public static void binaryToWrittenFile(byte[] binaryData, String filePath){
+        // 创建一个FileOutputStream对象，用于将二进制数据写入文件
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(filePath);
+            fos.write(binaryData);
+            fos.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+}
+
 
 

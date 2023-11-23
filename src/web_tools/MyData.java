@@ -25,17 +25,30 @@ public class MyData implements Serializable {
     private Object data;
     private int data_Index;
     private String serverMessage;
+
+    @Deprecated
     public<T extends Serializable> MyData(int type, T data){
         this(type, "", data);
     }
 
+    /**
+     * Constructor of the class <code>MyData</code>.
+     * This is a constructor to store the data you want to send. Including the type of the data, the message you want to send to the server,
+     * and the data you want to send.
+     * @param type The type of the data you want to send.
+     * @param serverMessage The message you want to send to the server. The server will read this message.
+     *                      For example, if you want to send a message to the server(if the operation of the server have sth to do with this param),
+     *                      you can use this parameter to send the message.
+     * @param data The data you want to send.
+     * @param <T> The class type of the data you want to send.
+     */
     public<T extends Serializable> MyData(int type, String serverMessage, T data){
         if(data == null || serverMessage == null) throw new NullPointerException("The data is null.");
 
         if(type < STRING_INDEX || type > IMAGE_INDEX) throw new IllegalArgumentException("The type is not in the range of supported types.");
 
-        if(type == FILE_INDEX && !(data instanceof File)) throw new IllegalArgumentException("The data is not a file.");
-        if(type == IMAGE_INDEX && !(data instanceof Image)) throw new IllegalArgumentException("The data is not an image.");
+//        if(type == FILE_INDEX && !(data instanceof byte[])) throw new IllegalArgumentException("The data is not a file.");
+//        if(type == IMAGE_INDEX && !(data instanceof Image)) throw new IllegalArgumentException("The data is not an image.");
 
         this.data = data;
         this.serverMessage = serverMessage;
