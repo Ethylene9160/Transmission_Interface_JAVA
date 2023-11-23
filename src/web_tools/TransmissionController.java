@@ -3,7 +3,15 @@ package web_tools;
 import java.io.*;
 import java.net.Socket;
 
-
+/**
+ * The proxy class of the transmission.
+ * @version beta1.0
+ * @see TransmissionListener
+ * @see Sender
+ * @see Receiver
+ * @see java.io.Serializable
+ * @see java.io.Closeable
+ */
 public class TransmissionController implements Closeable{
     /**
      * An instance of TransmissionListener.
@@ -19,7 +27,7 @@ public class TransmissionController implements Closeable{
      * Constructor of the transmission proxy <code>TransmissionController</code>
      * @param serverSocket The socket your program plugged
      * @param listener An instance you want to present.
-     * @seealso TransmissionListener.java
+     * @see TransmissionListener
      * @throws NullPointerException If the parameters you pass are all non-initialized variables, the exception will appear.
      * @throws IOException If there exists IOException in the input or output stream of the parameter <code>serverSocket</code>,
      * this exception will appear.
@@ -43,7 +51,7 @@ public class TransmissionController implements Closeable{
      *
      * @param message <b>Should be serialised!</b>
      *                The message you want to send.
-     * @seealso: Serializable.java
+     * @see java.io.Serializable
      * @version beta1.0
      */
     public void send(Object message){
