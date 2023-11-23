@@ -30,6 +30,7 @@ public interface TransmissionListener <T extends Serializable> {
     public void onTransmissionError(String message, ErrorType errorType);
 
     /**
+     * <b>The most important method</b> in the interface <code>TransmissionListener</code>.
      * When the proxy class <code>TransmissionController</code> receives a message,
      * this method will be called.
      * @param messages The messages from the proxy.
