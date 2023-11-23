@@ -2,13 +2,42 @@ package web_tools;
 
 import java.io.Serializable;
 
+/**
+ * A listener that can be used to listen to the transmission of the proxy class <code>TransmissionController</code>.
+ * Use template to make the class more flexible, and easy to use.
+ * @param <T> The class type of the message you want to receive.
+ * @version beta1.1
+ */
 public interface TransmissionListener <T extends Serializable> {
     /**
-     * The type of the error.
-     * @version beta1.0
+     * The error type of the proxy class <code>TransmissionController</code>.
+     * @version beta1.1
      */
     public enum ErrorType{
-        NONE_POINTER, IO_EXCEPTION, WRONG_OUTPUT_STREAM, WRONG_WRITE, WRONG_READ, CLASS_NOT_FOUND
+        /**
+         * When the pointer of the parameter <code>serverSocket</code> in the constructor of the proxy class <code>TransmissionController</code>
+         */
+        NONE_POINTER,
+        /**
+         * When the parameter <code>listener</code> in the constructor of the proxy class <code>TransmissionController</code>
+         */
+        IO_EXCEPTION,
+        /**
+         * When the parameter <code>listener</code> in the constructor of the proxy class <code>TransmissionController</code>
+         */
+        WRONG_OUTPUT_STREAM,
+        /**
+         * When the parameter <code>listener</code> in the constructor of the proxy class <code>TransmissionController</code>
+         */
+        WRONG_WRITE,
+        /**
+         * When the parameter <code>listener</code> in the constructor of the proxy class <code>TransmissionController</code>
+         */
+        WRONG_READ,
+        /**
+         * When the parameter <code>listener</code> in the constructor of the proxy class <code>TransmissionController</code>
+         */
+        CLASS_NOT_FOUND
     }
     /**
      * TODO Method hasn't been used.
@@ -25,7 +54,7 @@ public interface TransmissionListener <T extends Serializable> {
      * this method will be called.
      * @param message The message from the proxy.
      * @param errorType ErrorType.
-     * Todo: Method hasn't used; ErrorType hasn't declared.
+     * @version beta1.1
      */
     public void onTransmissionError(String message, ErrorType errorType);
 
@@ -43,7 +72,7 @@ public interface TransmissionListener <T extends Serializable> {
 
     /**
      * A temp method similar to <code>onTransmissionError</code>.
-     * @param error
+     * @param error A string that contains the error message.
      */
     public void alertError(String error);
 }
