@@ -30,9 +30,10 @@ Transmission_Interface_JAVA
 
 使用静态代理，实现不同进程间的通信。在程序中，需要建立TCP通讯套接字：
 
-$$
-Socket:={ <IP address>,~<Port>}
-$$
+<p align = 'center'>
+Socket:={&ltIP address&gt, &ltPort&gt}
+</p>
+
 
 客户机声明需要对接的进程的IP地址和进程信息，建立套接字连接。其中，Socket的声明可以是：
 ```java
@@ -132,7 +133,7 @@ Key: `TransmissionController`, `TransmissionListener`
   
   ```java
     public void send(Object message)
-    ```
+  ```
   
     该方法的参数是一个`Object`对象，发送的对象**必须实现`Serializable`接口**。
   > **为什么需要实现`Serializable`接口？**
@@ -209,5 +210,4 @@ transmissionController.send("Hello World!");
 例程`Main.java`和`MyServer.java`中，有对这个接口的使用。
 
 如果只希望发送字符串的话，作者的另一个仓库[useless_web_interface](https://github.com/Ethylene9160/useless_web_interface)中有一个更简单的实现。
-
 
