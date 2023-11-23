@@ -1,8 +1,9 @@
 package web_tools;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.Socket;
-
+import java.util.ArrayList;
 
 public class TransmissionController implements Closeable{
     /**
@@ -15,11 +16,13 @@ public class TransmissionController implements Closeable{
     private Socket serverSocket;
     private Thread receivingThread;
 
+    private ArrayList<Integer> list;
+
     /**
      * Constructor of the transmission proxy <code>TransmissionController</code>
      * @param serverSocket The socket your program plugged
      * @param listener An instance you want to present.
-     * @seealso TransmissionListener.java
+     * TransmissionListener.java
      * @throws NullPointerException If the parameters you pass are all non-initialized variables, the exception will appear.
      * @throws IOException If there exists IOException in the input or output stream of the parameter <code>serverSocket</code>,
      * this exception will appear.
@@ -28,13 +31,13 @@ public class TransmissionController implements Closeable{
     public TransmissionController(Socket serverSocket, TransmissionListener listener) throws IOException, NullPointerException{
         if(serverSocket == null) throw new NullPointerException("The socket has not been initialized");
         if(listener == null) throw new NullPointerException("The listener has not been initialized");
+
         this.serverSocket = serverSocket;
         this.listener = listener;
-        //Thread.sleep(100);
+
         this.sender = new Sender(this.serverSocket.getOutputStream(), listener);
-        System.out.println("Sender ok");
         this.receiver = new Receiver(this.serverSocket.getInputStream(), listener);
-        System.out.println("Receiver ok");
+
         this.receivingThread = new Thread(this.receiver);
         receivingThread.start();
     }
@@ -43,12 +46,12 @@ public class TransmissionController implements Closeable{
      *
      * @param message <b>Should be serialised!</b>
      *                The message you want to send.
-     * @seealso: Serializable.java
+     * Serializable.java
      * @version beta1.0
      */
-    public void send(Object message){
-        if(!(message instanceof Serializable)){
-            listener.alertError("NONE-SERILIZABLE");
+    public <T extends Serializable> void send(T message){
+        if(message == null){
+            listener.alertError("NONE-Pointer");
             return;
         }
         new Thread(()->sender.send(message)).start();
@@ -81,7 +84,7 @@ class Sender implements Closeable{
         }
         flag = true;
     }
-    void send(Object data){
+    <T extends Serializable> void send(T data){
         if(!flag) {
             listener.alertError("WrongOutputStream");
             return;
@@ -97,6 +100,7 @@ class Sender implements Closeable{
         }
     }
 
+    @Deprecated
     private void send(byte[] bytes){
         try {
             outputStream.write(bytes);
@@ -113,7 +117,7 @@ class Sender implements Closeable{
     }
 }
 
-class Receiver implements Runnable, Closeable{
+class Receiver<T extends Serializable> implements Runnable, Closeable{
     private Socket socket;
     private TransmissionListener listener;
     private ObjectInputStream objectInputStream;
@@ -133,8 +137,9 @@ class Receiver implements Runnable, Closeable{
     @Override
     public void run(){
         while(flag){
+            ArrayList<T> list = new ArrayList<>();
             try {
-                Object o = objectInputStream.readObject();
+                T o = (T)objectInputStream.readObject();
                 listener.onTransmissionProgress(o);
             }catch (IOException e){
                 e.printStackTrace();

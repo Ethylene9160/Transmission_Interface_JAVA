@@ -2,7 +2,10 @@ import web_tools.MyData;
 import web_tools.TransmissionController;
 import web_tools.TransmissionListener;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
+import java.io.Serializable;
 import java.net.Socket;
 
 public class Main {
@@ -37,7 +40,7 @@ public class Main {
 }
 
 
-class Person implements TransmissionListener {
+class Person implements TransmissionListener<MyData> {
 
     int ownID;
     String name;
@@ -59,7 +62,11 @@ class Person implements TransmissionListener {
 
     public void send(int targetID, String info) {
         //String s = targetID + StringServer.SPLIT_REG + info;
-        controller.send(new MyData(targetID + "#" + info));
+        controller.send(new MyData(MyData.STRING_INDEX,targetID + "#" + info));
+    }
+
+    public void send(int targetID, FileData data) {
+        controller.send(new MyData(MyData.FILE_INDEX,targetID + "#" , data));
     }
 
     private void showMessage(char index, String msg) {
@@ -90,14 +97,45 @@ class Person implements TransmissionListener {
     }
 
     @Override
-    public void onTransmissionProgress(Object o) {
-        String message = ((MyData)o).getData();
-        showMessage(message.charAt(0), message.substring(1));
+    public void onTransmissionProgress(MyData data) {
+        switch (data.getType()){
+            case MyData.STRING_INDEX:
+                String message = data.getServerMessage();
+                showMessage(message.charAt(0), message.substring(1));
+                break;
+            case MyData.FILE_INDEX:
+                String fileData = data.getData();
+                //System.out.println(fileData.getFileName());
+                //help me to write this file to the local disk
+
+                break;
+        }
+//        String message = messages.getData();
+//        showMessage(message.charAt(0), message.substring(1));
     }
+
 
     @Override
     public void alertError(String error) {
         System.out.println(error);
+    }
+}
+
+class FileData implements Serializable{
+    @Serial
+    private static final long serialVersionUID = 2333L;
+    private File file;
+    private String fileName;
+    public FileData(File file, String fileName){
+        this.file = file;
+        this.fileName = fileName;
+    }
+    public File getFile(){
+        return file;
+    }
+
+    public String getFileName(){
+        return fileName;
     }
 }
 

@@ -1,13 +1,15 @@
 package web_tools;
 
-public interface TransmissionListener {
+import java.io.Serializable;
+
+public interface TransmissionListener <T extends Serializable> {
     /**
-     * @TODO Method hasn't been used.
+     * TODO Method hasn't been used.
      */
     public void onTransmissionStart();
 
     /**
-     * @TODO Method hasn't been used.
+     * TODO Method hasn't been used.
      */
     public void onTransmissionEnd();
 
@@ -16,17 +18,20 @@ public interface TransmissionListener {
      * this method will be called.
      * @param message The message from the proxy.
      * @param errorType ErrorType.
-     * @Todo: Method hasn't used; ErrorType hasn't declared.
+     * Todo: Method hasn't used; ErrorType hasn't declared.
      */
     public void onTransmissionError(String message, int errorType);
 
     /**
-     * When receving an message in the proxy,
+     * When the proxy class <code>TransmissionController</code> receives a message,
      * this method will be called.
-     * @param messages The data you'll receive. That is the message sent from another socket.
+     * @param messages The messages from the proxy.
+     *                 <b>Should be serialised!</b>
      * @version beta1.0
+     * @see java.io.Serializable
      */
-    public void onTransmissionProgress(Object messages);
+    public void onTransmissionProgress(T messages);
+
 
     /**
      * A temp method similar to <code>onTransmissionError</code>.

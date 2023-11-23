@@ -2,8 +2,8 @@ import web_tools.MyData;
 import web_tools.TransmissionController;
 import web_tools.TransmissionListener;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public class MyServer{
             System.out.println("someone comes"+(listMap.size()+1));
             //
             //new DataOutputStream(socket.getOutputStream()).writeUTF(SEND_ID+Integer.toString(webID));
-            moveChannel.controller.send(new MyData(SEND_ID+Integer.toString(webID)));
+            moveChannel.controller.send(new MyData(0,SEND_ID+Integer.toString(webID)));
             listMap.put(webID, moveChannel);
             //list.add(moveChannel);
             //
@@ -40,7 +40,7 @@ public class MyServer{
     }
 }
 
-class Channel implements TransmissionListener {
+class Channel implements TransmissionListener<MyData> {
     int ownID;
     TransmissionController controller;
     public Channel(Socket clientSocket){
@@ -52,9 +52,10 @@ class Channel implements TransmissionListener {
     }
 
 
-    public void webAction(String message) {
+    public void webAction(MyData data) {
+        String message = data.getServerMessage();
         String info[] = message.split(MyServer.SPLIT_REG);
-        Objects.requireNonNull(MyServer.listMap.get(Integer.parseInt(info[0]))).controller.send(new MyData(info[1]));
+        Objects.requireNonNull(MyServer.listMap.get(Integer.parseInt(info[0]))).controller.send(data);
     }
 
     @Override
@@ -73,13 +74,13 @@ class Channel implements TransmissionListener {
     }
 
     @Override
-    public void onTransmissionProgress(Object messages) {
-        String s = ((MyData) messages).getData();
-        webAction(s);
+    public void onTransmissionProgress(MyData messages) {
+//        String s = ((MyData) messages).getData();
+        webAction(messages);
     }
 
     @Override
     public void alertError(String error) {
-
+        System.out.println(error);
     }
 }
