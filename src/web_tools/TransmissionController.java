@@ -45,6 +45,8 @@ public class TransmissionController implements Closeable{
 
         this.receivingThread = new Thread(this.receiver);
         receivingThread.start();
+
+        listener.onTransmissionStart();
     }
 
     /**
@@ -58,7 +60,8 @@ public class TransmissionController implements Closeable{
      */
     public <T extends Serializable> void send(T data){
         if(data == null){
-            listener.alertError("NULL-Pointer");
+            //listener.alertError("NULL-Pointer");
+            listener.onTransmissionError("NULL-Pointer", TransmissionListener.ErrorType.NULL_POINTER);
             return;
         }
         new Thread(()->sender.send(data)).start();
@@ -117,15 +120,16 @@ class Sender implements Closeable{
         //Ensure each thread can write the data to the stream one by one.
         synchronized (this) {
             if(!flag) {
-                listener.alertError("WrongOutputStream");
+                //listener.alertError("WrongOutputStream");
+                listener.onTransmissionError("WrongOutputStream", TransmissionListener.ErrorType.WRONG_OUTPUT_STREAM);
                 return;
             }
             try {
                 outputStream.writeObject(data);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
-                listener.alertError("WrongWrite");
-                listener.onTransmissionError("WrongWrite", TransmissionListener.ErrorType.WRONG_WRITE);
+                listener.onTransmissionError("WrongIO", TransmissionListener.ErrorType.IO_EXCEPTION);
                 flag = false;
             }
         }
@@ -181,13 +185,14 @@ class Receiver<T extends Serializable> implements Runnable, Closeable{
                 listener.onTransmissionProgress(o);
             }catch (IOException e){
                 e.printStackTrace();
-                listener.alertError("ReadError!");
+                //listener.alertError("ReadError!");
+                listener.onTransmissionError("WrongRead", TransmissionListener.ErrorType.WRONG_INPUT_STREAM);
                 WebUtil.closeAll(objectInputStream);
                 flag = false;
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-                listener.alertError("ClassNotFound");
-
+                //listener.alertError("ClassNotFound");
+                listener.onTransmissionError("ClassNotFound", TransmissionListener.ErrorType.CLASS_NOT_FOUND);
             }
         }
     }

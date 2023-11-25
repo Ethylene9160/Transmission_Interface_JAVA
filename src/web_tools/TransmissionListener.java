@@ -15,25 +15,31 @@ public interface TransmissionListener <T extends Serializable> {
      */
     public enum ErrorType{
         /**
-         * When the pointer of the parameter <code>serverSocket</code> in the constructor of the proxy class <code>TransmissionController</code>
+         * When the pointer of the parameter <code>data</code>  you transmit to the method <code>send</code>
+         * in the proxy class <code>TransmissionController</code>
+         * has not been initialized, this error will appear.
          */
-        NONE_POINTER,
+        NULL_POINTER,
         /**
-         * When the parameter <code>listener</code> in the constructor of the proxy class <code>TransmissionController</code>
+         * When unknown <code>IOException</code> happens in the proxy class <code>TransmissionController</code>,
+         * this error type will appear.
          */
         IO_EXCEPTION,
         /**
-         * When the parameter <code>listener</code> in the constructor of the proxy class <code>TransmissionController</code>
+         * When something wrong happens in the output stream when writing the data,
+         * this error type will appear.
+         * This mostly happens when there exists <b>un-serialised sub-instance</b> in your <code>data</code> you want to send.
          */
         WRONG_OUTPUT_STREAM,
         /**
-         * When the parameter <code>listener</code> in the constructor of the proxy class <code>TransmissionController</code>
+         * When the params you pass has not been seriallized, this error type will appear.
          */
-        WRONG_WRITE,
+        WRONG_SERIALIZABLE,
         /**
-         * When the parameter <code>listener</code> in the constructor of the proxy class <code>TransmissionController</code>
+         * When something wrong happens in the input stream when reading the data in the proxy instance <code>TransmissionController</code>,
+         * this error type will appear.
          */
-        WRONG_READ,
+        WRONG_INPUT_STREAM,
         /**
          * When the parameter <code>listener</code> in the constructor of the proxy class <code>TransmissionController</code>
          */
@@ -47,6 +53,7 @@ public interface TransmissionListener <T extends Serializable> {
     /**
      * TODO Method hasn't been used.
      */
+    @Deprecated
     public void onTransmissionEnd();
 
     /**
@@ -69,10 +76,10 @@ public interface TransmissionListener <T extends Serializable> {
      */
     public void onTransmissionProgress(T messages);
 
-
     /**
      * A temp method similar to <code>onTransmissionError</code>.
      * @param error A string that contains the error message.
      */
+    @Deprecated
     public void alertError(String error);
 }
