@@ -46,14 +46,13 @@ public interface TransmissionListener <T extends Serializable> {
         CLASS_NOT_FOUND
     }
     /**
-     * TODO Method hasn't been used.
+     * If the message begin to send, this method will be called.
      */
     public void onTransmissionStart();
 
     /**
-     * TODO Method hasn't been used.
+     * If the message has been sent successfully, the method will be called.
      */
-    @Deprecated
     public void onTransmissionEnd();
 
     /**

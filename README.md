@@ -4,7 +4,7 @@
 ![Static License](https://img.shields.io/badge/License-MIT-orange)
 ![Static Date](https://img.shields.io/badge/Date-2023--11--23-lightgrey)
 
-## 项目结构
+## 项目结构（部分）
 
 ```bash
 Transmission_Interface_JAVA
@@ -123,7 +123,7 @@ class MyServer{
 
 ## 特性
 
-使用*静态代理*实现不同进程间的通信。
+* 使用*静态代理*实现不同进程间的通信。
 
 Key: `TransmissionController`, `TransmissionListener`
 
@@ -163,6 +163,11 @@ Key: `TransmissionController`, `TransmissionListener`
   >**为什么需要在网络中传输字节流？**
   > 
   > 为了在不同进程间传输信息。
+* 使用泛型使能被序列化的message types不受限制
+
+在声明代理类的时候，使用`TransmissionListener<YourData> listener;`进行声明，其中`YourData`是你希望传输的数据类型。
+
+```java
 
 ## 使用方法
 
@@ -173,14 +178,14 @@ Socket socket = new Socket("host_ip", HOST_PORT);
 ```
 2. 在需要使用的进程中，建立静态代理类TransmissionController的实例，传入套接字socket，并传入代理对象`TransmissionListener`的实现类建立代理类与对应进程的连接。
 ```java
-TransmissionController transmissionController = new TransmissionController(socket, new TransmissionListener<String>() {
+TransmissionController<YourData> transmissionController = new TransmissionController(socket, new TransmissionListener<YourData>() {
     @Override
     public void onTransmissionStart(){
-        system.out.println("Transmission Start!");
+        system.out.println("Start transmissing!");
     }
     
     @Override
-    public void onTransmissionSuccess(Object o){
+    public void onTransmissionSuccess(YourData o){
         //接收到消息时，会将这个参数传递进来。
         //在这里处理接收到的消息。
         system.out.println("Transmission Success! received object: " + o.toString());
@@ -188,7 +193,7 @@ TransmissionController transmissionController = new TransmissionController(socke
     
     @Override
     public void onTransmissionEnd(){
-        system.out.println("Transmission End!");
+        system.out.println("Send successfully!");
     }
     
     @Override

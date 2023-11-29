@@ -120,6 +120,7 @@ class Sender implements Closeable{
         //Ensure each thread can write the data to the stream one by one.
         synchronized (this) {
             if(!flag) {
+                listener.onTransmissionStart();
                 //listener.alertError("WrongOutputStream");
                 listener.onTransmissionError("WrongOutputStream", TransmissionListener.ErrorType.WRONG_OUTPUT_STREAM);
                 return;
@@ -183,6 +184,7 @@ class Receiver<T extends Serializable> implements Runnable, Closeable{
             try {
                 T o = (T)objectInputStream.readObject();
                 listener.onTransmissionProgress(o);
+                listener.onTransmissionEnd();
             }catch (IOException e){
                 e.printStackTrace();
                 //listener.alertError("ReadError!");

@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * A class that contains a useful method to close all the instances of Closeable you pass.
+ * A class that contains a useful method to close all the instances of Closeable you pass. <b>No constructor provided</b>.
  */
 public class WebUtil {
 
