@@ -2,7 +2,6 @@ import web_tools.MyData;
 import web_tools.TransmissionController;
 import web_tools.TransmissionListener;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -24,23 +23,17 @@ public class MyServer{
         while(true){
             webID ++;
             Socket socket = moveServer.accept();
-            //System.out.println(socket.getRemoteSocketAddress());
-            //
             Channel moveChannel = new Channel(socket);
             moveChannel.ownID = webID;
             System.out.println("someone comes"+(listMap.size()+1));
-            //
-            //new DataOutputStream(socket.getOutputStream()).writeUTF(SEND_ID+Integer.toString(webID));
-            moveChannel.controller.send(new MyData(SEND_ID+Integer.toString(webID)));
+            //Because we're the server, so I don't want to send the <code>serverMessage</code> to the client.
+            moveChannel.controller.send(new MyData(MyData.STRING_INDEX,SEND_ID+Integer.toString(webID)));
             listMap.put(webID, moveChannel);
-            //list.add(moveChannel);
-            //
-//            new Thread(moveChannel).start();
         }
     }
 }
 
-class Channel implements TransmissionListener {
+class Channel implements TransmissionListener<MyData> {
     int ownID;
     TransmissionController controller;
     public Channel(Socket clientSocket){
@@ -49,12 +42,6 @@ class Channel implements TransmissionListener {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    public void webAction(String message) {
-        String info[] = message.split(MyServer.SPLIT_REG);
-        Objects.requireNonNull(MyServer.listMap.get(Integer.parseInt(info[0]))).controller.send(new MyData(info[1]));
     }
 
     @Override
@@ -68,18 +55,22 @@ class Channel implements TransmissionListener {
     }
 
     @Override
-    public void onTransmissionError(String message, int errorType) {
+    public void onTransmissionError(String message, ErrorType errorType) {
 
     }
 
     @Override
-    public void onTransmissionProgress(Object messages) {
-        String s = ((MyData) messages).getData();
-        webAction(s);
+    public void onTransmissionProgress(MyData data) {
+        String message = data.getServerMessage();
+        System.out.println("Server reseive the msg: "+message);
+        //String info[] = message.split(MyServer.SPLIT_REG);
+
+        Objects.requireNonNull(MyServer.listMap.get(Integer.parseInt(message))).controller.send(data);
+        System.out.println("Server reseive the msg to: "+Integer.parseInt(message));
     }
 
     @Override
     public void alertError(String error) {
-
+        System.out.println(error);
     }
 }
