@@ -46,6 +46,7 @@ public interface TransmissionListener <T extends Serializable> {
         CLASS_NOT_FOUND
     }
     /**
+
      * If the message begin to send, this method will be called.
      */
     public void onTransmissionStart();

@@ -5,12 +5,14 @@ import java.net.Socket;
 
 /**
  * A proxy class that can be used to send and receive messages.
+ * The proxy class of the transmission.
  * @see TransmissionListener
  * @see Sender
  * @see Receiver
  * @see java.io.Serializable
  * @see java.io.ObjectOutputStream
  * @version beta1.1
+ * @see java.io.Closeable
  */
 public class TransmissionController implements Closeable{
     /**
@@ -27,7 +29,8 @@ public class TransmissionController implements Closeable{
      * Constructor of the transmission proxy <code>TransmissionController</code>
      * @param targetSocket The socket your program plugged
      * @param listener An instance you want to present.
-     * TransmissionListener.java
+     * @see TransmissionListener
+
      * @throws NullPointerException If the parameters you pass are all non-initialized variables, the exception will appear.
      * @throws IOException If there exists IOException in the input or output stream of the parameter <code>serverSocket</code>,
      * this exception will appear.
@@ -53,8 +56,12 @@ public class TransmissionController implements Closeable{
      * Send the message to the socket it connect to.
      * @param data <b>Should be serialised!</b>
      *                The message you want to send.
+
      * @param <T> The class type of the message you want to send. Use template to make the class more flexible and easy to use.
-     * Serializable.java
+     
+
+     * @see java.io.Serializable
+
      * @version beta1.0
      *
      */

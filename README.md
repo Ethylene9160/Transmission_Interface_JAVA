@@ -4,7 +4,9 @@
 ![Static License](https://img.shields.io/badge/License-MIT-orange)
 ![Static Date](https://img.shields.io/badge/Date-2023--11--23-lightgrey)
 
+
 ## 项目结构（部分）
+
 
 ```bash
 Transmission_Interface_JAVA
@@ -33,7 +35,6 @@ Transmission_Interface_JAVA
 <p align = 'center'>
 Socket:={&ltIP address&gt, &ltPort&gt}
 </p>
-
 
 客户机声明需要对接的进程的IP地址和进程信息，建立套接字连接。其中，Socket的声明可以是：
 ```java
@@ -133,7 +134,9 @@ Key: `TransmissionController`, `TransmissionListener`
   
   ```java
     public void send(Object message)
+
   ```
+
   
     该方法的参数是一个`Object`对象，发送的对象**必须实现`Serializable`接口**。
   > **为什么需要实现`Serializable`接口？**
@@ -163,11 +166,13 @@ Key: `TransmissionController`, `TransmissionListener`
   >**为什么需要在网络中传输字节流？**
   > 
   > 为了在不同进程间传输信息。
+
 * 使用泛型使能被序列化的message types不受限制
 
 在声明代理类的时候，使用`TransmissionListener<YourData> listener;`进行声明，其中`YourData`是你希望传输的数据类型。
 
 ```java
+
 
 ## 使用方法
 
@@ -178,6 +183,7 @@ Socket socket = new Socket("host_ip", HOST_PORT);
 ```
 2. 在需要使用的进程中，建立静态代理类TransmissionController的实例，传入套接字socket，并传入代理对象`TransmissionListener`的实现类建立代理类与对应进程的连接。
 ```java
+
 TransmissionController<YourData> transmissionController = new TransmissionController(socket, new TransmissionListener<YourData>() {
     @Override
     public void onTransmissionStart(){
@@ -186,6 +192,7 @@ TransmissionController<YourData> transmissionController = new TransmissionContro
     
     @Override
     public void onTransmissionSuccess(YourData o){
+
         //接收到消息时，会将这个参数传递进来。
         //在这里处理接收到的消息。
         system.out.println("Transmission Success! received object: " + o.toString());

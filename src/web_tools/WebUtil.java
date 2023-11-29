@@ -9,6 +9,7 @@ import java.io.IOException;
 public class WebUtil {
 
     private WebUtil(){}
+
     /**
      * Close all the instances of Closeable you pass.
      * @param cs The instances of Closeable you want to close.
