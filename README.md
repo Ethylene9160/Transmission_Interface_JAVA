@@ -4,7 +4,9 @@
 ![Static License](https://img.shields.io/badge/License-MIT-orange)
 ![Static Date](https://img.shields.io/badge/Date-2023--11--23-lightgrey)
 
-## 项目结构
+
+## 项目结构（部分）
+
 
 ```bash
 Transmission_Interface_JAVA
@@ -30,9 +32,9 @@ Transmission_Interface_JAVA
 
 使用静态代理，实现不同进程间的通信。在程序中，需要建立TCP通讯套接字：
 
-$$
-Socket:={ <IP address>,~<Port>}
-$$
+<p align = 'center'>
+Socket:={&ltIP address&gt, &ltPort&gt}
+</p>
 
 客户机声明需要对接的进程的IP地址和进程信息，建立套接字连接。其中，Socket的声明可以是：
 ```java
@@ -122,7 +124,7 @@ class MyServer{
 
 ## 特性
 
-使用*静态代理*实现不同进程间的通信。
+* 使用*静态代理*实现不同进程间的通信。
 
 Key: `TransmissionController`, `TransmissionListener`
 
@@ -132,7 +134,9 @@ Key: `TransmissionController`, `TransmissionListener`
   
   ```java
     public void send(Object message)
-    ```
+
+  ```
+
   
     该方法的参数是一个`Object`对象，发送的对象**必须实现`Serializable`接口**。
   > **为什么需要实现`Serializable`接口？**
@@ -163,6 +167,13 @@ Key: `TransmissionController`, `TransmissionListener`
   > 
   > 为了在不同进程间传输信息。
 
+* 使用泛型使能被序列化的message types不受限制
+
+在声明代理类的时候，使用`TransmissionListener<YourData> listener;`进行声明，其中`YourData`是你希望传输的数据类型。
+
+```java
+
+
 ## 使用方法
 
 1. 在需要使用的进程中，建立TCP通讯套接字，声明需要对接的进程的IP地址和进程信息，建立套接字连接。其中，Socket的声明可以是：
@@ -172,14 +183,16 @@ Socket socket = new Socket("host_ip", HOST_PORT);
 ```
 2. 在需要使用的进程中，建立静态代理类TransmissionController的实例，传入套接字socket，并传入代理对象`TransmissionListener`的实现类建立代理类与对应进程的连接。
 ```java
-TransmissionController transmissionController = new TransmissionController(socket, new TransmissionListener<String>() {
+
+TransmissionController<YourData> transmissionController = new TransmissionController(socket, new TransmissionListener<YourData>() {
     @Override
     public void onTransmissionStart(){
-        system.out.println("Transmission Start!");
+        system.out.println("Start transmissing!");
     }
     
     @Override
-    public void onTransmissionSuccess(Object o){
+    public void onTransmissionSuccess(YourData o){
+
         //接收到消息时，会将这个参数传递进来。
         //在这里处理接收到的消息。
         system.out.println("Transmission Success! received object: " + o.toString());
@@ -187,7 +200,7 @@ TransmissionController transmissionController = new TransmissionController(socke
     
     @Override
     public void onTransmissionEnd(){
-        system.out.println("Transmission End!");
+        system.out.println("Send successfully!");
     }
     
     @Override
@@ -209,5 +222,4 @@ transmissionController.send("Hello World!");
 例程`Main.java`和`MyServer.java`中，有对这个接口的使用。
 
 如果只希望发送字符串的话，作者的另一个仓库[useless_web_interface](https://github.com/Ethylene9160/useless_web_interface)中有一个更简单的实现。
-
 
